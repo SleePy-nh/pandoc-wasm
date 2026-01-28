@@ -3,8 +3,8 @@
 # DO NOT EDIT - regenerated on task file change
 
 source_file: RALPH_TASK.md
-source_mtime: 1769608961
-generated_at: 2026-01-28T14:13:19Z
+source_mtime: 1769610578
+generated_at: 2026-01-28T14:31:23Z
 
 tasks:
   - id: "line_14"
@@ -23,14 +23,14 @@ tasks:
     raw_marker: -
   - id: "line_18"
     line_number: 18
-    status: pending
+    status: completed
     parallel_group: 999999
     description: Create cabal.project with WASM-compatible configuration
     indent_level: 0
     raw_marker: -
   - id: "line_19"
     line_number: 19
-    status: pending
+    status: completed
     parallel_group: 999999
     description: Run wasm32-wasi-cabal update
     indent_level: 0
@@ -39,28 +39,28 @@ tasks:
     line_number: 20
     status: pending
     parallel_group: 999999
-    description: Build pandoc-cli with wasm32-wasi-cabal
+    description: Build pandoc-cli with wasm32-wasi-cabal (IN PROGRESS)
     indent_level: 0
     raw_marker: -
   - id: "line_23"
     line_number: 23
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: Address network/HTTP dependency issues
+    description: Address basement WASM/GHC 9.12 compatibility (patched)
     indent_level: 0
     raw_marker: -
   - id: "line_24"
     line_number: 24
-    status: pending
+    status: completed
     parallel_group: 999999
-    description: Address process/unix dependency issues
+    description: Address digest zlib dependency (disabled pkg-config)
     indent_level: 0
     raw_marker: -
   - id: "line_25"
     line_number: 25
     status: pending
     parallel_group: 999999
-    description: Create minimal pandoc wrapper if full build fails
+    description: Address any remaining dependency issues (monitoring)
     indent_level: 0
     raw_marker: -
   - id: "line_28"

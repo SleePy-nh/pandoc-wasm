@@ -184,6 +184,18 @@ struct sockaddr_un {
 # include <netioapi.h>
 #endif
 
+/* WASI doesn't define struct cmsghdr - provide our own definition */
+#if defined(__wasi__) || defined(__wasm32__)
+# ifndef __WASI_CMSGHDR_DEFINED__
+#  define __WASI_CMSGHDR_DEFINED__
+struct cmsghdr {
+    socklen_t cmsg_len;   /* Length including header */
+    int cmsg_level;       /* Protocol level */
+    int cmsg_type;        /* Protocol-specific type */
+};
+# endif
+#endif
+
 #ifdef _WIN32
 extern int   initWinSock ();
 extern const char* getWSErrorDescr(int err);
