@@ -10,6 +10,8 @@ extra-packages: pandoc-cli-3.8.3
 -- Use patched packages for WASM compatibility
 packages: patches/basement-0.0.16
           patches/memory-0.18.0
+          patches/network-3.2.8.0
+          patches/cborg-0.2.10.0
 
 -- Disable problematic features for WASM
 package pandoc-cli

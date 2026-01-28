@@ -15,14 +15,14 @@ Compile Pandoc to WebAssembly for converting Markdown to PPTX (and other formats
 - [x] Verify wasm32-wasi-ghc --version works (9.12.3.20251231)
 
 ### Phase 1: Project Setup and Build
-- [ ] Create cabal.project with WASM-compatible configuration
-- [ ] Run wasm32-wasi-cabal update
-- [ ] Build pandoc-cli with wasm32-wasi-cabal
+- [x] Create cabal.project with WASM-compatible configuration
+- [x] Run wasm32-wasi-cabal update
+- [ ] Build pandoc-cli with wasm32-wasi-cabal (IN PROGRESS)
 
 ### Phase 2: Handle Dependency Failures (if needed)
-- [ ] Address network/HTTP dependency issues
-- [ ] Address process/unix dependency issues
-- [ ] Create minimal pandoc wrapper if full build fails
+- [x] Address basement WASM/GHC 9.12 compatibility (patched)
+- [x] Address digest zlib dependency (disabled pkg-config)
+- [ ] Address any remaining dependency issues (monitoring)
 
 ### Phase 3: Validation
 - [ ] Create test markdown files (small.md, medium.md, large.md)
