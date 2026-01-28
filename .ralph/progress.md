@@ -121,6 +121,39 @@ This is how Ralph maintains continuity across iterations.
 ### 2026-01-28 15:24:26
 **Session 3 started** (model: opus-4.5-thinking)
 
+**Accomplishments:**
+- Fixed cborg-0.2.10.0 for 32-bit WASM GHC 9.12:
+  - Removed deprecated GHC.IntWord64 import (removed in GHC 9.4+)
+  - Fixed Word#/Word64# and Int#/Int64# type mismatches in Decoding.hs
+  - Fixed conversion functions in Magic.hs for ghc-prim 0.8.0+ 
+  - Fixed bugs in Read.hs (syntax errors in isWord64Canonical, isInt64Canonical)
+- Fixed crypton-1.0.5 for WASI:
+  - Added ARGON2_NO_THREADS define to disable pthreads (WASI doesn't support pthread_exit)
+- Fixed cabal.project:
+  - Added cborg-0.2.10.0 to patched packages
+  - Added crypton-1.0.5 to patched packages  
+- Installed happy parser generator for native builds
+- Build is now progressing through pandoc dependencies
+
+**Build Status:**
+- cborg: ✅ Built successfully
+- crypton: ✅ Built successfully  
+- network: ✅ Built successfully
+- tls: ✅ Built successfully (required single-threaded GHC)
+- Many other packages: ✅ Built successfully
+- xml-conduit: ❌ BLOCKER - Custom setup type causes cross-compilation failure
+
+**Blocker Encountered:**
+xml-conduit-1.10.1.0 uses `build-type: Custom` which means its Setup.hs must be
+compiled and run on the host. But cabal is trying to build it for WASM target,
+causing "unable to find library -lHSrts-1.0.3_thr" error.
+
+**Next Steps for Next Agent:**
+1. Investigate cabal options for cross-compilation setup dependencies
+2. Try patching xml-conduit to use Simple build type if possible
+3. Or explore using --allow-boot-library-installs or similar workarounds
+4. Alternative: build a minimal pandoc without XML features
+
 ### 2026-01-28 15:31:23
 **Session 3 ended** - 🔄 Context rotation (token limit reached)
 

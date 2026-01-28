@@ -29,3 +29,30 @@
 **Symptom**: Configure fails looking for system zlib.h
 **Root Cause**: digest tries to find system zlib via pkg-config, but WASM cross-compile has no system zlib
 **Fix**: Add `package digest` with `flags: -pkg-config` in cabal.project to use bundled zlib from zlib-clib
+
+### Sign: Custom Build Types Break Cross-Compilation
+**Date**: 2026-01-28
+**Symptom**: Error "unable to find library -lHSrts-1.0.3_thr" when building setup executable
+**Root Cause**: Packages with `build-type: Custom` need their Setup.hs compiled for the HOST, not the TARGET (WASM). Cabal cross-compilation doesn't handle this correctly.
+**Fix**: 
+- Use packages with Simple build type when possible
+- Patch packages to change Custom to Simple if they don't actually need Custom
+- Look into cabal's setup-depends configuration for cross-compilation
+
+### Sign: GHC WASM Parallel Compilation Race Conditions
+**Date**: 2026-01-28
+**Symptom**: Missing .dyn_o files, "does not exist (No such file or directory)" during compilation
+**Root Cause**: Parallel GHC compilation on WASM cross-compiler has race conditions
+**Fix**: Use `--ghc-options="-j1"` to force single-threaded compilation
+
+### Sign: cborg 0.2.10.0 Has 32-bit Bugs
+**Date**: 2026-01-28  
+**Symptom**: Syntax errors in isWord64Canonical, missing GHC.IntWord64 import
+**Root Cause**: cborg's 32-bit ARCH code was never tested on modern GHC; has syntax errors and uses deprecated GHC.IntWord64
+**Fix**: Patch Magic.hs, Decoding.hs, Read.hs to fix conversions and remove GHC.IntWord64 imports
+
+### Sign: crypton argon2 needs ARGON2_NO_THREADS for WASI
+**Date**: 2026-01-28
+**Symptom**: Error "call to undeclared function 'pthread_exit'"  
+**Root Cause**: WASI doesn't support pthread_exit, but crypton's argon2 code uses pthreads
+**Fix**: Add `#define ARGON2_NO_THREADS 1` at top of cbits/argon2/thread.h and thread.c for __wasi__ or __wasm__

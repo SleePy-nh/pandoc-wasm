@@ -13,7 +13,6 @@ packages: patches/basement-0.0.16
           patches/network-3.2.8.0
           patches/cborg-0.2.10.0
           patches/crypton-1.0.5
-          patches/crypton-1.0.5
 
 -- Disable problematic features for WASM
 package pandoc-cli
