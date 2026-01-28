@@ -24,8 +24,10 @@
 #endif
 #define __APPLE_USE_RFC_3542 1 /* for IPV6_RECVPKTINFO */
 
-/* WASI-specific definitions - only add missing constants, WASI already has the structs */
+/* WASI-specific: include socket headers early to ensure structs are defined */
 #if defined(__wasi__) || defined(__wasm32__)
+# include <sys/types.h>
+# include <sys/socket.h>
 # ifndef SCM_RIGHTS
 #  define SCM_RIGHTS 0x01  /* Transfer file descriptors */
 # endif
