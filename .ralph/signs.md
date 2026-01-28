@@ -74,3 +74,11 @@
 **Symptom**: Linker error "unable to find library -lHSrts-1.0.3_thr"
 **Root Cause**: pandoc-cli.cabal has `-threaded` in ghc-options, but WASM GHC doesn't have threaded RTS
 **Fix**: Patch pandoc-cli.cabal to remove `-threaded` from the ghc-options line
+
+### Sign: network package socket stubs must not conflict with WASI libc
+**Date**: 2026-01-28
+**Symptom**: Linker errors "duplicate symbol: accept" or "undefined symbol: socket"
+**Root Cause**: WASI P1 libc provides SOME socket functions (accept, send, recv, shutdown) but NOT others (socket, bind, listen, connect). Stubbing all of them causes either duplicates or missing symbols.
+**Fix**: In network's cbits/HsNet.c, only stub functions NOT provided by WASI libc:
+- Stub: socket, bind, listen, connect, setsockopt, getsockopt, getpeername, getsockname, sendto, recvfrom
+- Do NOT stub: accept, send, recv, shutdown (provided by WASI libc)
