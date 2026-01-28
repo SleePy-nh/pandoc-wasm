@@ -166,3 +166,28 @@ causing "unable to find library -lHSrts-1.0.3_thr" error.
 
 ### 2026-01-28 15:31:25
 **Session 4 started** (model: opus-4.5-thinking)
+
+**Accomplishments:**
+- Fixed crypton-1.0.5 build for WASM:
+  - Added WASI detection to cbits/argon2/thread.c and thread.h
+  - ARGON2_NO_THREADS now properly defined for wasm32
+- Fixed xml-conduit-1.10.1.0 for WASM:
+  - Changed build-type from Custom to Simple (doctest not needed)
+  - Removed custom-setup dependency on cabal-doctest
+- Fixed pandoc-cli-3.8.3 for WASM:
+  - Removed -threaded from ghc-options (WASM has no threaded RTS)
+- Build progressing: 36+ packages now built
+- All major patches working: basement, memory, network, cborg, crypton, xml-conduit
+
+**Key Fixes:**
+- tls-2.1.14 had filesystem race condition - fixed by using -j1 (single job)
+- pandoc-cli links with -threaded by default - patched to remove it
+
+**Build Status:**
+- Compiling remaining dependencies (100+ total packages)
+- Final pandoc.wasm link pending
+
+**Next Steps:**
+- Wait for full build to complete
+- Validate pandoc.wasm with wasmtime
+- Test Markdown to PPTX conversion

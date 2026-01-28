@@ -30,6 +30,18 @@
 **Root Cause**: digest tries to find system zlib via pkg-config, but WASM cross-compile has no system zlib
 **Fix**: Add `package digest` with `flags: -pkg-config` in cabal.project to use bundled zlib from zlib-clib
 
+### Sign: Packages with Custom Setup.hs fail with threaded RTS error
+**Date**: 2026-01-28
+**Symptom**: Build fails with "unable to find library -lHSrts-1.0.3_thr" during configure step
+**Root Cause**: Custom Setup.hs executables link with threaded RTS, which doesn't exist in WASM
+**Fix**: Patch packages to use `build-type: Simple` instead of Custom. Example: xml-conduit uses Custom for doctests - change to Simple.
+
+### Sign: Executables with -threaded fail to link on WASM
+**Date**: 2026-01-28
+**Symptom**: Final link fails with "unable to find library -lHSrts-1.0.3_thr"
+**Root Cause**: GHC WASM doesn't have a threaded runtime system
+**Fix**: Patch the cabal file to remove `-threaded` from ghc-options. Example: pandoc-cli has `-threaded` hardcoded.
+
 ### Sign: Custom Build Types Break Cross-Compilation
 **Date**: 2026-01-28
 **Symptom**: Error "unable to find library -lHSrts-1.0.3_thr" when building setup executable
