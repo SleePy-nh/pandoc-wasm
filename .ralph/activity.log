@@ -306,3 +306,21 @@ Ralph Session Started: mer. 28 janv. 2026 15:31:25 CET
 [15:48:31] 🟢 SHELL source ~/.ghc-wasm/env && wasm32-wasi-cabal build network -v 2>&1 | tail -100 → exit 0
 [15:48:35] 🟢 TOKENS: 39613 / 80000 (49%) [read:149KB write:0KB assist:2KB shell:0KB]
 [15:48:37] 🟢 SHELL ls -la dist-newstyle/build/wasm32-wasi/ghc-*/network-*/build/*.a 2>/dev/null → exit 0
+[15:53:42] 🟢 SHELL source ~/.ghc-wasm/env && wasm32-wasi-cabal build pandoc-cli 2>&1 | head -200 → exit 0
+[15:53:42] 🟢 TOKENS: 39655 / 80000 (49%) [read:149KB write:0KB assist:2KB shell:0KB]
+[15:53:59] 🟢 SHELL source ~/.ghc-wasm/env && wasm32-wasi-cabal info crypton 2>&1 | head -50 → exit 0
+[15:54:04] 🟢 SHELL ls ~/.ghc-wasm/.cabal/packages/hackage.haskell.org/crypton/1.0.5/ 2>/dev/null || echo "Not in cache" → exit 0
+[15:54:09] 🟢 SHELL cd /tmp && tar -xzf ~/.ghc-wasm/.cabal/packages/hackage.haskell.org/crypton/1.0.5/crypton-1.0.5.tar.gz && cat crypton-1.0.5/crypton.cabal | head -100 → exit 0
+[15:54:12] 🟢 TOKENS: 39695 / 80000 (49%) [read:149KB write:0KB assist:3KB shell:0KB]
+[15:54:14] 🟢 SHELL cat /tmp/crypton-1.0.5/cbits/argon2/thread.c → exit 0
+[15:54:20] 🟢 SHELL mkdir -p patches/crypton-1.0.5 && cp -r /tmp/crypton-1.0.5/* patches/crypton-1.0.5/ → exit 0
+[15:54:29] 🟢 READ /Users/nathanhimpens/Documents/klara/code/pandoc-wasm/patches/crypton-1.0.5/cbits/argon2/thread.h (73 lines, ~7.1KB)
+[15:54:42] 🟢 TOKENS: 41575 / 80000 (51%) [read:156KB write:0KB assist:3KB shell:0KB]
+[15:54:45] 🟢 READ /Users/nathanhimpens/Documents/klara/code/pandoc-wasm/patches/crypton-1.0.5/cbits/argon2/thread.c (63 lines, ~6.1KB)
+[15:55:03] 🟢 SHELL grep -r "pthread" patches/crypton-1.0.5/cbits/argon2/ 2>/dev/null → exit 0
+[15:55:10] 🟢 SHELL rm -rf dist-newstyle/build/wasm32-wasi/ghc-*/crypton-* && source ~/.ghc-wasm/env && wasm32-wasi-cabal build crypton 2>&1 | tail -80 → exit 0
+[15:55:12] 🟢 TOKENS: 43197 / 80000 (53%) [read:162KB write:0KB assist:3KB shell:0KB]
+[15:55:14] 🟢 SHELL source ~/.ghc-wasm/env && wasm32-wasi-cabal build crypton 2>&1 | tail -100 → exit 0
+[15:55:18] 🟢 SHELL pwd && ls cabal.project 2>/dev/null && cat cabal.project | head -20 → exit 0
+[15:55:45] 🟢 SHELL cd /Users/nathanhimpens/Documents/klara/code/pandoc-wasm && source ~/.ghc-wasm/env && wasm32-wasi-cabal build crypton 2>&1 | tail -100 → exit 0
+[15:55:45] 🟢 TOKENS: 43197 / 80000 (53%) [read:162KB write:0KB assist:3KB shell:0KB]
