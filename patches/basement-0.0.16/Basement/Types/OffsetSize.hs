@@ -223,7 +223,8 @@ countOfRoundUp alignment (CountOf n) = CountOf ((n + (alignment-1)) .&. compleme
 
 csizeOfSize :: CountOf Word8 -> CSize
 #if WORD_SIZE_IN_BITS < 64
-csizeOfSize (CountOf (I# sz)) = CSize (W32# (int2Word# sz))
+-- GHC 9.4+: need explicit conversion from Word# to Word32#
+csizeOfSize (CountOf (I# sz)) = CSize (W32# (wordToWord32# (int2Word# sz)))
 #else
 #if __GLASGOW_HASKELL__ >= 904
 csizeOfSize (CountOf (I# sz)) = CSize (W64# (wordToWord64# (int2Word# sz)))
@@ -236,7 +237,8 @@ csizeOfSize (CountOf (I# sz)) = CSize (W64# (int2Word# sz))
 
 csizeOfOffset :: Offset8 -> CSize
 #if WORD_SIZE_IN_BITS < 64
-csizeOfOffset (Offset (I# sz)) = CSize (W32# (int2Word# sz))
+-- GHC 9.4+: need explicit conversion from Word# to Word32#
+csizeOfOffset (Offset (I# sz)) = CSize (W32# (wordToWord32# (int2Word# sz)))
 #else
 #if __GLASGOW_HASKELL__ >= 904
 csizeOfOffset (Offset (I# sz)) = CSize (W64# (wordToWord64# (int2Word# sz)))
@@ -248,7 +250,8 @@ csizeOfOffset (Offset (I# sz)) = CSize (W64# (int2Word# sz))
 sizeOfCSSize :: CSsize -> CountOf Word8
 sizeOfCSSize (CSsize (-1))      = error "invalid size: CSSize is -1"
 #if WORD_SIZE_IN_BITS < 64
-sizeOfCSSize (CSsize (I32# sz)) = CountOf (I# sz)
+-- GHC 9.4+: need explicit conversion from Int32# to Int#
+sizeOfCSSize (CSsize (I32# sz)) = CountOf (I# (int32ToInt# sz))
 #else
 #if __GLASGOW_HASKELL__ >= 904
 sizeOfCSSize (CSsize (I64# sz)) = CountOf (I# (int64ToInt# sz))
@@ -259,7 +262,8 @@ sizeOfCSSize (CSsize (I64# sz)) = CountOf (I# sz)
 
 sizeOfCSize :: CSize -> CountOf Word8
 #if WORD_SIZE_IN_BITS < 64
-sizeOfCSize (CSize (W32# sz)) = CountOf (I# (word2Int# sz))
+-- GHC 9.4+: need explicit conversion from Word32# to Word#
+sizeOfCSize (CSize (W32# sz)) = CountOf (I# (word2Int# (word32ToWord# sz)))
 #else
 #if __GLASGOW_HASKELL__ >= 904
 sizeOfCSize (CSize (W64# sz)) = CountOf (I# (word2Int# (word64ToWord# sz)))

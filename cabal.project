@@ -7,12 +7,17 @@ index-state: 2026-01-20T00:00:00Z
 -- Build from Hackage, no local packages needed
 extra-packages: pandoc-cli-3.8.3
 
--- Use patched basement for WASM compatibility
+-- Use patched packages for WASM compatibility
 packages: patches/basement-0.0.16
+          patches/memory-0.18.0
 
 -- Disable problematic features for WASM
 package pandoc-cli
   flags: -lua -server
+
+-- Disable pkg-config for digest (use bundled zlib from zlib-clib)
+package digest
+  flags: -pkg-config
 
 -- Embed data files for standalone WASM binary
 package pandoc
