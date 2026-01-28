@@ -107,12 +107,19 @@ This is how Ralph maintains continuity across iterations.
 
 **Current Status:**
 - Full pandoc-cli build in progress
-- Build started at 14:49 UTC, still running
-- ~13 packages built so far, many more to go
+- Build restarted at 15:08 UTC after fixing RTS options issue
+- 37 packages built so far including pandoc-3.8.3 (main library!)
+- Waiting for pandoc-cli executable to link
+
+**Packages Built:**
+- basement, memory, network (patched)
+- crypton and all crypton-x509 packages  
+- skylighting packages
+- pandoc-3.8.3 library
+- tls, http-client-tls, citeproc, typst
 
 **Next Steps:**
-- Wait for pandoc-cli build to complete
-- If build fails, fix new errors (likely more memset/memcpy signature issues)
+- Wait for pandoc-cli linking to complete
 - Test WASM binary with wasmtime
 
 ### 2026-01-28 15:24:24

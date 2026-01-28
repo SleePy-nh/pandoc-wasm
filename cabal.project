@@ -4,8 +4,7 @@
 -- Use Hackage packages
 index-state: 2026-01-20T00:00:00Z
 
--- Build from Hackage, no local packages needed
-extra-packages: pandoc-cli-3.8.3
+-- pandoc-cli is now in patches, pandoc will be pulled as dependency
 
 -- Use patched packages for WASM compatibility
 packages: patches/basement-0.0.16
@@ -13,6 +12,8 @@ packages: patches/basement-0.0.16
           patches/network-3.2.8.0
           patches/cborg-0.2.10.0
           patches/crypton-1.0.5
+          patches/xml-conduit-1.10.1.0
+          patches/pandoc-cli-3.8.3
 
 -- Disable problematic features for WASM
 package pandoc-cli
