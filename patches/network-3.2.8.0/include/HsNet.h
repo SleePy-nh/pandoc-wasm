@@ -26,6 +26,9 @@
 
 /* WASI-specific: include socket headers early to ensure structs are defined */
 #if defined(__wasi__) || defined(__wasm32__)
+# ifndef _GNU_SOURCE
+#  define _GNU_SOURCE 1  /* Required for CMSG_* macros in WASI */
+# endif
 # include <sys/types.h>
 # include <sys/socket.h>
 # ifndef SCM_RIGHTS
@@ -33,6 +36,9 @@
 # endif
 # ifndef AF_UNIX
 #  define AF_UNIX 1
+# endif
+# ifndef SO_LINGER
+#  define SO_LINGER 13  /* Linger on close if data present */
 # endif
 # ifndef SOMAXCONN
 #  define SOMAXCONN 128
@@ -184,15 +190,53 @@ struct sockaddr_un {
 # include <netioapi.h>
 #endif
 
-/* WASI doesn't define struct cmsghdr - provide our own definition */
+/* WASI doesn't define struct cmsghdr, msghdr, or CMSG macros - provide our own definitions */
 #if defined(__wasi__) || defined(__wasm32__)
-# ifndef __WASI_CMSGHDR_DEFINED__
-#  define __WASI_CMSGHDR_DEFINED__
+# ifndef __WASI_SOCKET_STRUCTS_DEFINED__
+#  define __WASI_SOCKET_STRUCTS_DEFINED__
+
+/* struct iovec for scatter/gather I/O - only define if not already present */
+#  ifndef __WASI_IOVEC_DEFINED__
+#   define __WASI_IOVEC_DEFINED__
+#   if !defined(_SYS_UIO_H) && !defined(_BITS_UIO_H)
+struct iovec {
+    void *iov_base;   /* Starting address */
+    size_t iov_len;   /* Number of bytes to transfer */
+};
+#   endif
+#  endif
+
 struct cmsghdr {
     socklen_t cmsg_len;   /* Length including header */
     int cmsg_level;       /* Protocol level */
     int cmsg_type;        /* Protocol-specific type */
 };
+/* Note: struct msghdr is provided by WASI libc */
+/* CMSG macros - may not be defined in modified WASI libc */
+#  ifndef CMSG_ALIGN
+#   define CMSG_ALIGN(len) (((len) + sizeof(size_t) - 1) & (size_t)~(sizeof(size_t) - 1))
+#  endif
+#  ifndef CMSG_SPACE
+#   define CMSG_SPACE(len) (CMSG_ALIGN(len) + CMSG_ALIGN(sizeof(struct cmsghdr)))
+#  endif
+#  ifndef CMSG_LEN
+#   define CMSG_LEN(len) (CMSG_ALIGN(sizeof(struct cmsghdr)) + (len))
+#  endif
+#  ifndef CMSG_DATA
+#   define CMSG_DATA(cmsg) ((unsigned char *)(((struct cmsghdr *)(cmsg)) + 1))
+#  endif
+#  ifndef CMSG_FIRSTHDR
+#   define CMSG_FIRSTHDR(mhdr) \
+       ((size_t)(mhdr)->msg_controllen >= sizeof(struct cmsghdr) \
+        ? (struct cmsghdr *)(mhdr)->msg_control : (struct cmsghdr *)0)
+#  endif
+#  ifndef CMSG_NXTHDR
+#   define CMSG_NXTHDR(mhdr, cmsg) \
+       (((char *)(cmsg) + CMSG_ALIGN((cmsg)->cmsg_len) + sizeof(struct cmsghdr) \
+         > (char *)(mhdr)->msg_control + (mhdr)->msg_controllen) \
+        ? (struct cmsghdr *)0 \
+        : (struct cmsghdr *)((char *)(cmsg) + CMSG_ALIGN((cmsg)->cmsg_len)))
+#  endif
 # endif
 #endif
 

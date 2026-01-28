@@ -352,7 +352,7 @@ toInt64  n = I64# n
 toWord64 n = W64# n
 #endif
 #else
--- On 32-bit, Int64# and Word64# are distinct types
+-- On 32-bit, Int64# and Word64# are distinct unboxed types
 toInt64  :: Int64# -> Int64
 toWord64 :: Word64# -> Word64
 toInt64  n = I64# n

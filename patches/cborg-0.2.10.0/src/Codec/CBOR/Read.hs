@@ -64,7 +64,8 @@ import qualified Data.Text.Encoding as T
 import           Data.Word
 import           GHC.Word
 #if defined(ARCH_32bit)
-import           GHC.IntWord64
+-- GHC.IntWord64 was removed in GHC 9.4+
+-- The primops are now available from GHC.Exts
 #endif
 import           GHC.Exts
 import           GHC.Float (float2Double)
@@ -1271,11 +1272,15 @@ go_slow da bs !offset = do
 
     SlowPeekByteOffset bs' k ->
       lift
+#if defined(ARCH_64bit)
 #if MIN_VERSION_base(4,17,0)
         (k (int64ToInt# off#))
 #else
         (k off#)
-
+#endif
+#else
+        -- On 32-bit, off# is Int64# which is what k expects
+        (k off#)
 #endif
         >>= \daz -> go_slow daz bs' offset'
       where
@@ -1381,9 +1386,14 @@ go_slow_overlapped da sz bs_cur bs_next !offset =
       SlowPeekByteOffset bs_empty k ->
         assert (BS.null bs_empty) $ do
         lift
+#if defined(ARCH_64bit)
 #if MIN_VERSION_base(4,17,0)
           (k (int64ToInt# off#))
 #else
+          (k off#)
+#endif
+#else
+          -- On 32-bit, off# is Int64# which is what k expects
           (k off#)
 #endif
           >>= \daz -> go_slow daz bs' offset'
@@ -1565,19 +1575,19 @@ isIntCanonical sz i
 {-# INLINE isWord64Canonical #-}
 isWord64Canonical :: Int -> Word64 -> Bool
 isWord64Canonical sz w
-  | sz == 2   = w > 0x17)
-  | sz == 3   = w > 0xff)
-  | sz == 5   = w > 0xffff)
-  | sz == 9   = w > 0xffffffff)
+  | sz == 2   = w > 0x17
+  | sz == 3   = w > 0xff
+  | sz == 5   = w > 0xffff
+  | sz == 9   = w > 0xffffffff
   | otherwise = True
 
 {-# INLINE isInt64Canonical #-}
-isInt64Canonical :: Int -> Int64# -> Bool
-isInt64Canonical sz i#
-  | isTrue# (i# `ltInt64#` intToInt64# 0#) = isWord64Canonical sz (not64# w#)
-  | otherwise                              = isWord64Canonical sz         w#
+isInt64Canonical :: Int -> Int64 -> Bool
+isInt64Canonical sz i
+  | i < 0     = isWord64Canonical sz (complement w)
+  | otherwise = isWord64Canonical sz w
   where
-    w# = int64ToWord64# i#
+    w = int64ToWord64 i
 #endif
 
 {-# INLINE isSimpleCanonical #-}
@@ -1796,7 +1806,7 @@ tryConsumeInteger hdr !bs = case word8ToWord hdr of
   0x1b -> let !w = eatTailWord64 bs
               sz = 9
 #if defined(ARCH_32bit)
-          in DecodedToken sz (BigIntToken (isWord64Canonical sz (word64ToWord w)) $! toInteger w)
+          in DecodedToken sz (BigIntToken (isWord64Canonical sz w) $! toInteger w)
 #else
           in DecodedToken sz (BigIntToken (isWordCanonical sz (word64ToWord w))   $! toInteger w)
 #endif
@@ -1838,7 +1848,7 @@ tryConsumeInteger hdr !bs = case word8ToWord hdr of
   0x3b -> let !w = eatTailWord64 bs
               sz = 9
 #if defined(ARCH_32bit)
-          in DecodedToken sz (BigIntToken (isWord64Canonical sz (word64ToWord w)) $! (-1 - toInteger w))
+          in DecodedToken sz (BigIntToken (isWord64Canonical sz w) $! (-1 - toInteger w))
 #else
           in DecodedToken sz (BigIntToken (isWordCanonical sz (word64ToWord w))   $! (-1 - toInteger w))
 #endif

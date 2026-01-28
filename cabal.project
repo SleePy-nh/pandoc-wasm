@@ -30,6 +30,10 @@ constraints:
   pandoc == 3.8.3,
   pandoc-cli == 3.8.3
 
+-- Enable _GNU_SOURCE for network package C code on WASI
+package network
+  cc-options: -D_GNU_SOURCE
+
 -- Optimization
 program-options
   ghc-options: -O2

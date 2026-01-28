@@ -1,3 +1,8 @@
+/* Ensure _GNU_SOURCE is defined for CMSG_* macros on WASI */
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+
 #include "HsNet.h"
 #include <string.h>
 

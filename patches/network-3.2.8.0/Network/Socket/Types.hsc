@@ -1440,8 +1440,8 @@ instance Read PortNumber where
 ------------------------------------------------------------------------
 -- Helper functions
 
-foreign import ccall unsafe "string.h" memset :: Ptr a -> CInt -> CSize -> IO ()
+foreign import ccall unsafe "string.h" memset :: Ptr a -> CInt -> CSize -> IO (Ptr a)
 
 -- | Zero a structure.
 zeroMemory :: Ptr a -> CSize -> IO ()
-zeroMemory dest nbytes = memset dest 0 (fromIntegral nbytes)
+zeroMemory dest nbytes = memset dest 0 (fromIntegral nbytes) >> return ()

@@ -122,11 +122,9 @@ import           Data.Bits ((.|.), unsafeShiftL)
 
 #if defined(ARCH_32bit)
 -- GHC.IntWord64 was removed in GHC 9.4+
--- In GHC 9.4+, Int64# and Word64# are proper types with primops in GHC.Exts
--- The following primops are now in GHC.Exts:
+-- These primops are now available directly from GHC.Exts (imported above):
 --   wordToWord64#, word64ToWord#, intToInt64#, int64ToInt#,
 --   leWord64#, ltWord64#, word64ToInt64#
--- They are already exported by GHC.Exts (imported above)
 #endif
 
 --------------------------------------------------------------------------------
