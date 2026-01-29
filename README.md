@@ -88,7 +88,7 @@ wasm32-wasi-ghc --version
 ### Étape 2 : Cloner ce repository
 
 ```bash
-git clone https://github.com/votre-repo/pandoc-wasm.git
+git clone [https://github.com/votre-repo/pandoc-wasm.git](https://github.com/SleePy-nh/pandoc-wasm.git)
 cd pandoc-wasm
 ```
 
