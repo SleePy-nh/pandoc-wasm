@@ -1,5 +1,25 @@
-# Ralph config (may contain API key)
-.cursor/ralph-config.json
+# Build outputs
 dist-newstyle/
 pandoc.wasm
+*.wasm
+
+# Generated documents
 *.pptx
+*.docx
+
+# macOS
+.DS_Store
+
+# Editor / IDE
+.cursor/ralph-config.json
+.vscode/
+*.swp
+*~
+
+# Haskell
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+cabal.project.local
+cabal.project.local~
