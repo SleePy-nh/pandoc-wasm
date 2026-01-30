@@ -1,0 +1,41 @@
+# Build outputs
+dist-newstyle/
+*.pptx
+*.docx
+
+# Haskell build artifacts
+*.hi
+*.o
+*.dyn_hi
+*.dyn_o
+cabal.project.local
+cabal.project.local~
+
+# Source patches (not needed in npm package)
+patches/
+
+# Development files
+.ralph/
+.cursor/
+.vscode/
+*.swp
+*~
+
+# macOS
+.DS_Store
+
+# Git
+.git/
+.gitignore
+
+# Documentation (keep README.md)
+SECURITY.md
+RALPH_TASK.md
+
+# Cabal project file
+cabal.project
+
+# Test files
+tests/
+*.md
+!README.md

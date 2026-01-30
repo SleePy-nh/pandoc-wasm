@@ -1,0 +1,39 @@
+{
+  "name": "@nathanhimpens/pandoc-wasm",
+  "version": "1.0.0",
+  "description": "Pandoc 3.8.3 compiled to WebAssembly for document conversion in WASI environments",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "postinstall": "node lib/download.js"
+  },
+  "keywords": [
+    "pandoc",
+    "wasm",
+    "wasi",
+    "document",
+    "conversion",
+    "markdown",
+    "html",
+    "pptx",
+    "docx"
+  ],
+  "author": "",
+  "license": "GPL-2.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NathanHimpens/pandoc-wasm.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NathanHimpens/pandoc-wasm/issues"
+  },
+  "homepage": "https://github.com/NathanHimpens/pandoc-wasm#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "files": [
+    "index.js",
+    "lib/",
+    "README.md"
+  ]
+}

@@ -34,6 +34,36 @@ Ce projet permet de compiler [Pandoc](https://pandoc.org/), le convertisseur de 
 
 ---
 
+## Installation via npm
+
+Pour utiliser `pandoc.wasm` comme dépendance dans vos projets Node.js :
+
+```bash
+npm install @nathanhimpens/pandoc-wasm
+```
+
+Le fichier `pandoc.wasm` sera automatiquement téléchargé depuis les [GitHub Releases](https://github.com/NathanHimpens/pandoc-wasm/releases) lors de l'installation.
+
+### Utilisation dans votre code
+
+```javascript
+const pandocWasmPath = require('@nathanhimpens/pandoc-wasm');
+const { execSync } = require('child_process');
+
+// Utilisation avec wasmtime
+execSync(`wasmtime run --dir . ${pandocWasmPath} -o output.pptx input.md`);
+```
+
+### Note importante
+
+Le package nécessite que `pandoc.wasm` soit disponible dans une release GitHub. Si aucune release n'existe encore, vous devrez :
+
+1. Compiler le binaire vous-même (voir section [HOW TO : Compiler soi-même](#how-to--compiler-soi-même))
+2. Créer une release GitHub avec `pandoc.wasm` en pièce jointe
+3. Ou copier manuellement le fichier dans `node_modules/@nathanhimpens/pandoc-wasm/`
+
+---
+
 ## Comment ça fonctionne
 
 ```mermaid
