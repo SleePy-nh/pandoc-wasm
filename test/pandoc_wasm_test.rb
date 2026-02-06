@@ -78,19 +78,19 @@ class PandocWasmTest < Minitest::Test
 
   def test_run_delegates_to_runner
     called_args = nil
+    called_wasm_dir = nil
 
-    fake_run = lambda do |input, output, wasm_dir:, extra_args:|
-      called_args = { input: input, output: output, wasm_dir: wasm_dir, extra_args: extra_args }
+    fake_run = lambda do |*args, wasm_dir:|
+      called_args = args
+      called_wasm_dir = wasm_dir
       { stdout: '', stderr: '', success: true }
     end
 
     PandocWasm::Runner.stub(:run, fake_run) do
-      result = PandocWasm.run('in.md', 'out.pptx', wasm_dir: '/data', extra_args: ['--slide-level=2'])
+      result = PandocWasm.run('-o', 'out.pptx', '--slide-level=2', 'in.md', wasm_dir: '/data')
       assert_equal true, result[:success]
-      assert_equal 'in.md', called_args[:input]
-      assert_equal 'out.pptx', called_args[:output]
-      assert_equal '/data', called_args[:wasm_dir]
-      assert_equal ['--slide-level=2'], called_args[:extra_args]
+      assert_equal ['-o', 'out.pptx', '--slide-level=2', 'in.md'], called_args
+      assert_equal '/data', called_wasm_dir
     end
   end
 end

@@ -12,7 +12,7 @@ class RunnerTest < Minitest::Test
     PandocWasm.binary_path = '/tmp/nonexistent_pandoc_wasm_test.wasm'
 
     error = assert_raises(PandocWasm::BinaryNotFound) do
-      PandocWasm::Runner.run('input.md', 'output.pptx')
+      PandocWasm::Runner.run('-o', 'output.pptx', 'input.md')
     end
 
     assert_match(/not found/, error.message)
@@ -35,7 +35,7 @@ class RunnerTest < Minitest::Test
       end
 
       Open3.stub(:capture3, fake_capture3) do
-        PandocWasm::Runner.run('input.md', 'output.pptx', wasm_dir: '/mydir')
+        PandocWasm::Runner.run('-o', 'output.pptx', 'input.md', wasm_dir: '/mydir')
       end
 
       expected = ['wasmtime', 'run', '--dir', '/mydir', binary, '-o', 'output.pptx', 'input.md']
@@ -45,7 +45,7 @@ class RunnerTest < Minitest::Test
 
   # -- includes extra_args in command --
 
-  def test_includes_extra_args
+  def test_passes_all_args_through
     Dir.mktmpdir do |dir|
       binary = File.join(dir, 'pandoc.wasm')
       File.write(binary, 'fake')
@@ -58,15 +58,12 @@ class RunnerTest < Minitest::Test
       end
 
       Open3.stub(:capture3, fake_capture3) do
-        PandocWasm::Runner.run('in.md', 'out.pptx', extra_args: ['--slide-level=2', '--reference-doc=ref.pptx'])
+        PandocWasm::Runner.run('-o', 'out.pptx', '--slide-level=2', '--reference-doc=ref.pptx', 'in.md')
       end
 
-      assert_includes captured_cmd, '--slide-level=2'
-      assert_includes captured_cmd, '--reference-doc=ref.pptx'
-      # extra_args come before input
-      slide_idx = captured_cmd.index('--slide-level=2')
-      input_idx = captured_cmd.index('in.md')
-      assert slide_idx < input_idx, 'extra_args should come before input file'
+      # args appear after the binary path, in the order given
+      args_part = captured_cmd[5..]
+      assert_equal ['-o', 'out.pptx', '--slide-level=2', '--reference-doc=ref.pptx', 'in.md'], args_part
     end
   end
 
@@ -86,7 +83,7 @@ class RunnerTest < Minitest::Test
       end
 
       Open3.stub(:capture3, fake_capture3) do
-        PandocWasm::Runner.run('in.md', 'out.pptx')
+        PandocWasm::Runner.run('-o', 'out.pptx', 'in.md')
       end
 
       assert_equal 'wasmer', captured_cmd.first
@@ -107,7 +104,7 @@ class RunnerTest < Minitest::Test
 
       result = nil
       Open3.stub(:capture3, fake_capture3) do
-        result = PandocWasm::Runner.run('in.md', 'out.pptx')
+        result = PandocWasm::Runner.run('-o', 'out.pptx', 'in.md')
       end
 
       assert_equal true, result[:success]
@@ -131,7 +128,7 @@ class RunnerTest < Minitest::Test
       error = nil
       Open3.stub(:capture3, fake_capture3) do
         error = assert_raises(PandocWasm::ExecutionError) do
-          PandocWasm::Runner.run('in.md', 'out.pptx')
+          PandocWasm::Runner.run('-o', 'out.pptx', 'in.md')
         end
       end
 
@@ -155,7 +152,7 @@ class RunnerTest < Minitest::Test
       end
 
       Open3.stub(:capture3, fake_capture3) do
-        PandocWasm::Runner.run('in.md', 'out.pptx')
+        PandocWasm::Runner.run('-o', 'out.pptx', 'in.md')
       end
 
       dir_flag_idx = captured_cmd.index('--dir')

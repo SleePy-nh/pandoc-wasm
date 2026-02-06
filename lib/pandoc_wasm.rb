@@ -39,20 +39,19 @@ module PandocWasm
       Downloader.download(to: binary_path)
     end
 
-    # Run pandoc via the WASI runtime.
+    # Run the wasm binary via the WASI runtime.
+    # All positional arguments are passed through to the binary.
     #
     # Translates to:
-    #   <runtime> run --dir <wasm_dir> <binary_path> -o <output> [extra_args...] <input>
+    #   <runtime> run --dir <wasm_dir> <binary_path> <args...>
     #
-    # @param input [String] path to the input file
-    # @param output [String] path to the output file
+    # @param args [Array<String>] arguments passed to the wasm binary
     # @param wasm_dir [String] directory to expose to the WASI sandbox (default: ".")
-    # @param extra_args [Array<String>] additional pandoc CLI arguments
     # @return [Hash] { stdout: String, stderr: String, success: Boolean }
     # @raise [BinaryNotFound] if binary_path does not exist
     # @raise [ExecutionError] on non-zero exit code
-    def run(input, output, wasm_dir: '.', extra_args: [])
-      Runner.run(input, output, wasm_dir: wasm_dir, extra_args: extra_args)
+    def run(*args, wasm_dir: '.')
+      Runner.run(*args, wasm_dir: wasm_dir)
     end
 
     # Check if the .wasm binary exists at binary_path.

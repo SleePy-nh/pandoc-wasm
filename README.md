@@ -91,10 +91,10 @@ PandocWasm.runtime = "wasmtime"  # par défaut
 PandocWasm.download_to_binary_path!
 
 # Convertir un document (Markdown → PowerPoint)
-PandocWasm.run("input.md", "output.pptx", wasm_dir: ".")
+PandocWasm.run("-o", "output.pptx", "input.md", wasm_dir: ".")
 
 # Avec des arguments pandoc supplémentaires
-PandocWasm.run("input.md", "output.pptx", wasm_dir: ".", extra_args: ["--slide-level=2"])
+PandocWasm.run("-o", "output.pptx", "--slide-level=2", "input.md", wasm_dir: ".")
 
 # Vérifier si pandoc.wasm est disponible
 PandocWasm.available?  # => true / false

@@ -31,6 +31,7 @@ test/
   <tool>_wasm_test.rb         # Tests for main module (config, delegation, introspection)
   runner_test.rb              # Tests for Runner (command building, errors, result)
   downloader_test.rb          # Tests for Downloader (signature, errors, path expansion)
+  integration_test.rb         # Full user workflow scenario (configure, download, run)
 <tool>_wasm.gemspec           # Gem specification
 Rakefile                      # rake test runs test/**/*_test.rb via Minitest
 AGENTS.md                     # This file — reusable guidelines
@@ -68,14 +69,14 @@ Every gem MUST expose exactly these public methods on the top-level module:
 ### Execution
 
 ```ruby
-# Run the wasm binary with the given input/output files.
+# Run the wasm binary. All positional arguments are passed through to the binary.
 # Translates to:
-#   <runtime> run --dir <wasm_dir> <binary_path> -o <output> [extra_args...] <input>
+#   <runtime> run --dir <wasm_dir> <binary_path> <args...>
 #
 # Returns a Hash: { stdout: String, stderr: String, success: Boolean }
 # Raises BinaryNotFound if the binary is missing at binary_path.
 # Raises ExecutionError (with stderr) on non-zero exit code.
-<Tool>Wasm.run(input, output, wasm_dir: ".", extra_args: [])
+<Tool>Wasm.run(*args, wasm_dir: ".")
 ```
 
 ### Introspection
@@ -138,8 +139,8 @@ module <Tool>Wasm
       Downloader.download(to: binary_path)
     end
 
-    def run(input, output, wasm_dir: '.', extra_args: [])
-      Runner.run(input, output, wasm_dir: wasm_dir, extra_args: extra_args)
+    def run(*args, wasm_dir: '.')
+      Runner.run(*args, wasm_dir: wasm_dir)
     end
 
     def available?
@@ -186,9 +187,7 @@ The runner (`lib/<tool>_wasm/runner.rb`) must:
      'run',
      '--dir', wasm_dir,
      <Tool>Wasm.binary_path,
-     '-o', output,
-     *extra_args,
-     input
+     *args
    ]
    ```
 3. Raise `BinaryNotFound` before executing if `binary_path` does not exist.
@@ -221,9 +220,7 @@ To create a new gem for a different WASM binary:
    - `ASSET_NAME`
 5. Update `version.rb` with the new gem version.
 6. Update the gemspec metadata (name, description, homepage, etc.).
-7. If the binary expects different CLI arguments than `-o <output> <input>`,
-   adapt the command construction in `runner.rb`.
-8. If the WASI runtime needs additional flags (e.g. `--mapdir`, `--env`),
+7. If the WASI runtime needs additional flags (e.g. `--mapdir`, `--env`),
    add them as configurable options on the module and pass them through in the runner.
 
 ---
@@ -302,8 +299,7 @@ When modifying or creating a gem of this type, the test suite MUST cover:
 
 **Runner (`test/runner_test.rb`)**:
 - [ ] Raises `BinaryNotFound` when binary does not exist
-- [ ] Builds the correct command array: `[runtime, "run", "--dir", wasm_dir, binary, "-o", output, *extra_args, input]`
-- [ ] Includes `extra_args` in the command, positioned before the input file
+- [ ] Builds the correct command array: `[runtime, "run", "--dir", wasm_dir, binary, *args]`
 - [ ] Uses the configured `runtime` in the command
 - [ ] Returns `{ stdout:, stderr:, success: true }` on success
 - [ ] Raises `ExecutionError` with exit status and stderr on failure
@@ -315,3 +311,85 @@ When modifying or creating a gem of this type, the test suite MUST cover:
 - [ ] `download` raises on network error (re-raises after warning)
 - [ ] `download` expands the target path via `File.expand_path`
 - [ ] `download` returns `true` on success
+
+**Integration (`test/integration_test.rb`)**:
+- [ ] Full workflow: configure -> download -> available? -> run succeeds
+- [ ] Run before download raises `BinaryNotFound`
+
+### 10.5 Integration Test Pattern
+
+Every gem MUST include an integration test (`test/integration_test.rb`) that
+simulates the complete user journey in a single scenario. This ensures the
+public API methods compose correctly end-to-end.
+
+The test walks through these steps in order:
+
+1. **Configure** -- set `binary_path` to a temp directory and `runtime` to a
+   non-default value (e.g. `"wazero"`) to prove configuration is respected.
+2. **Assert not available** -- `available?` returns `false` before download.
+3. **Download** -- call `download_to_binary_path!` (stub `Downloader.download`
+   to write a fake file to the `to:` path).
+4. **Assert available** -- `available?` returns `true` after download.
+5. **Run** -- call `run(*args, wasm_dir:)` (stub `Open3.capture3`), then
+   inspect the captured command array to verify:
+   - `cmd[0]` is the configured runtime
+   - `cmd[4]` is the configured `binary_path`
+   - `cmd[5..]` matches the args passed in.
+
+A second scenario verifies that calling `run` before downloading raises
+`BinaryNotFound`.
+
+```ruby
+class IntegrationTest < Minitest::Test
+  include <Tool>WasmTestHelper
+
+  def test_full_user_workflow
+    Dir.mktmpdir do |dir|
+      target = File.join(dir, '<tool>.wasm')
+
+      # 1. Configure
+      <Tool>Wasm.binary_path = target
+      <Tool>Wasm.runtime = 'wazero'
+
+      # 2. Not available yet
+      refute <Tool>Wasm.available?
+
+      # 3. Download (stub writes fake file)
+      <Tool>Wasm::Downloader.stub(:download, ->(to:) { File.write(to, 'fake'); true }) do
+        <Tool>Wasm.download_to_binary_path!
+      end
+
+      # 4. Now available
+      assert <Tool>Wasm.available?
+
+      # 5. Run (stub Open3, capture command)
+      captured_cmd = nil
+      fake_capture3 = lambda do |*cmd|
+        captured_cmd = cmd
+        status = Minitest::Mock.new
+        status.expect(:success?, true)
+        ['', '', status]
+      end
+
+      Open3.stub(:capture3, fake_capture3) do
+        result = <Tool>Wasm.run('-o', 'output.pptx', 'input.md', wasm_dir: dir)
+        assert result[:success]
+      end
+
+      # 6. Verify command shape
+      assert_equal 'wazero', captured_cmd[0]
+      assert_equal target, captured_cmd[4]
+      assert_equal ['-o', 'output.pptx', 'input.md'], captured_cmd[5..]
+    end
+  end
+
+  def test_run_before_download_raises_binary_not_found
+    Dir.mktmpdir do |dir|
+      <Tool>Wasm.binary_path = File.join(dir, '<tool>.wasm')
+      assert_raises(<Tool>Wasm::BinaryNotFound) do
+        <Tool>Wasm.run('-o', 'output.pptx', 'input.md', wasm_dir: dir)
+      end
+    end
+  end
+end
+```

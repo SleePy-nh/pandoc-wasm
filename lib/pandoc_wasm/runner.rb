@@ -4,16 +4,15 @@ require 'open3'
 
 module PandocWasm
   class Runner
-    # Run pandoc via the WASI runtime.
+    # Run the wasm binary via the WASI runtime.
+    # All positional arguments are passed through to the binary.
     #
-    # @param input [String] path to the input file
-    # @param output [String] path to the output file
+    # @param args [Array<String>] arguments passed to the wasm binary
     # @param wasm_dir [String] directory to expose to the WASI sandbox (default: ".")
-    # @param extra_args [Array<String>] additional pandoc CLI arguments
     # @return [Hash] { stdout: String, stderr: String, success: Boolean }
     # @raise [PandocWasm::BinaryNotFound] if the binary does not exist
     # @raise [PandocWasm::ExecutionError] on non-zero exit code
-    def self.run(input, output, wasm_dir: '.', extra_args: [])
+    def self.run(*args, wasm_dir: '.')
       binary = PandocWasm.binary_path
 
       unless File.exist?(binary)
@@ -27,9 +26,7 @@ module PandocWasm
         'run',
         '--dir', wasm_dir,
         binary,
-        '-o', output,
-        *extra_args,
-        input
+        *args
       ]
 
       stdout, stderr, status = Open3.capture3(*cmd)
