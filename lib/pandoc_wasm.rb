@@ -30,7 +30,7 @@ module PandocWasm
       @runtime || 'wasmtime'
     end
 
-    # Download the .wasm binary from the latest GitHub Release to binary_path.
+    # Download the .wasm binary from the GitHub Release matching the gem version.
     # Creates intermediate directories if needed.
     #
     # @return [true] on success
