@@ -164,7 +164,7 @@ wasm32-wasi-ghc --version
 ### Étape 2 : Cloner ce repository
 
 ```bash
-git clone https://github.com/SleePy-nh/pandoc-wasm.git
+git clone https://github.com/NathanHimpens/pandoc-wasm.git
 cd pandoc-wasm
 ```
 
@@ -338,10 +338,27 @@ Extraits de `.ralph/signs.md` - les pièges à éviter lors de la compilation WA
 ```
 pandoc-wasm/
 ├── README.md              # Ce fichier
+├── CHANGELOG.md           # Journal des modifications
 ├── SECURITY.md            # Détails des patches de sécurité
+├── LICENSE.txt            # Licence GPL-2.0-or-later
 ├── RALPH_TASK.md          # Définition de la tâche pour Ralph
+├── pandoc_wasm.gemspec    # Spécification de la gem Ruby
+├── Gemfile                # Dépendances de développement
+├── Rakefile               # Tâches rake (test, build, release)
 ├── cabal.project          # Configuration de build Cabal
 ├── .gitignore
+├── lib/                   # Code source de la gem
+│   ├── pandoc_wasm.rb     # Point d'entrée — module + API publique
+│   └── pandoc_wasm/
+│       ├── version.rb     # Constante VERSION
+│       ├── downloader.rb  # Téléchargement du .wasm depuis GitHub
+│       └── runner.rb      # Exécution via le runtime WASI
+├── test/                  # Tests unitaires et d'intégration (Minitest)
+│   ├── test_helper.rb
+│   ├── pandoc_wasm_test.rb
+│   ├── runner_test.rb
+│   ├── downloader_test.rb
+│   └── integration_test.rb
 ├── tests/                 # Fichiers de test Markdown
 │   ├── small.md
 │   ├── medium.md
