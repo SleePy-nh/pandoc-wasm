@@ -79,6 +79,8 @@ module PandocWasm
 
       File.open(target, 'wb') do |file|
         loop do
+          redirected = false
+
           download_http = Net::HTTP.new(download_uri.host, download_uri.port)
           download_http.use_ssl = (download_uri.scheme == 'https')
           download_http.read_timeout = 300
@@ -93,17 +95,17 @@ module PandocWasm
               redirects += 1
               raise "Too many redirects" if redirects > max_redirects
               download_uri = URI(dl_response['location'])
-              next
+              redirected = true
             when Net::HTTPSuccess
               dl_response.read_body do |chunk|
                 file.write(chunk)
               end
             else
-              raise "Failed to download asset: #{dl_response.code}"
+              raise "Failed to download asset: HTTP #{dl_response.code}"
             end
           end
 
-          break
+          break unless redirected
         end
       end
 

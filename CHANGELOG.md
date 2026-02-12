@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-02-12
+
+### Fixed
+
+- Fix redirect handling in downloader that prevented asset downloads from GitHub Releases (HTTP 302 not followed).
+
 ## [1.0.1] - 2026-02-10
 
 ### Fixed
